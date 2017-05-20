@@ -1,0 +1,10 @@
+{
+  "devDependencies": {
+    "@types/jasmine": "^2.5.47",
+    "jasmine-core": "^2.6.1",
+    "jasmine-ts": "^0.1.2"
+  },
+  "scripts": {
+    "test": "jasmine-ts 'spec/**/*.spec.ts'"
+  }
+}
