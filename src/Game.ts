@@ -1,6 +1,8 @@
 export class Game {
     private readonly board = new Board();
-    private readonly players = new PlayerPool([new Player('X'), new Player('O')]);
+    private readonly players = new PlayerPool(
+        ['X', 'O'].map((s) => new Player(s))
+    );
     private winner: Player;
 
     public getBoard(): string {
@@ -54,11 +56,11 @@ class PlayerPool {
 }
 
 class Board {
-    private cells: Cell[][] = [
-        [new Cell(), new Cell(), new Cell()],
-        [new Cell(), new Cell(), new Cell()],
-        [new Cell(), new Cell(), new Cell()],
-    ];
+    private cells: Cell[][] = [0, 1, 2].map(
+        () => [0, 1, 2].map(
+            () => new Cell()
+        )
+    );
 
     public toString(): string {
         return this.cells.map(
