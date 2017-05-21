@@ -19,6 +19,10 @@ export class Board {
         return this.cells[row][col];
     }
 
+    public isFull(): boolean {
+        return this.cells.reduce((all, row) => all.concat(row), []).every((cell) => cell.isTaken());
+    }
+
     public getLines(): Line[] {
         const diagonals = [
             [[0, 0], [1, 1], [2, 2]],
@@ -50,6 +54,10 @@ export class Cell {
     }
     public belongsTo(player: Player): boolean {
         return player === this.player;
+    }
+
+    public isTaken(): boolean {
+        return !!this.player;
     }
 }
 

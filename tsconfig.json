@@ -4,6 +4,5 @@
     "noImplicitThis": true,
     "strictNullChecks": true,
     "alwaysStrict": true
-
   }
 }

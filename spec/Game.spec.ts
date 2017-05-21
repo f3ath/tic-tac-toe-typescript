@@ -48,7 +48,7 @@ describe('Game won by X', () => {
         expect(() => game.move(2, 2)).toThrowError();
     });
     it('has winner', () => {
-        expect(game.getWinner()).toEqual('X');
+        expect(game.getScore()).toEqual('X won!');
     })
 });
 
@@ -78,7 +78,40 @@ describe('Game won by O', () => {
         expect(() => game.move(1, 2)).toThrowError();
     });
     it('has winner', () => {
-        expect(game.getWinner()).toEqual('O');
+        expect(game.getScore()).toEqual('O won!');
+    })
+});
+
+describe('Game is draw', () => {
+    const moves: (0 | 1 | 2)[][] = [
+        [1, 1],
+        [0, 0],
+        [1, 0],
+        [1, 2],
+        [0, 2],
+        [2, 0],
+        [0, 1],
+        [2, 1],
+        [2, 2],
+    ];
+    const expected = '' +
+        'OXX' +
+        'XXO' +
+        'OOX';
+
+    const game = new Game();
+    moves.map(([r, c]) => game.move(r, c));
+    it(`after moves ${moves} the board should be '${expected}'`, () => {
+        expect(game.getBoard()).toEqual(expected);
+    });
+    it('has undefined active player', () => {
+        expect(game.getActivePlayer()).toBeUndefined();
+    });
+    it('is not possible to make next move', () => {
+        expect(() => game.move(1, 2)).toThrowError();
+    });
+    it('has no winner', () => {
+        expect(game.getScore()).toEqual('Draw!');
     })
 });
 

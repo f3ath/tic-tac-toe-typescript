@@ -17,14 +17,14 @@ export default class Game {
         this.strategy = this.strategy.move(row, col, this.board);
     }
 
-    public getWinner(): PlayerChar | undefined {
-        return this.strategy.getWinnerChar()
+    public getScore(): string {
+        return this.strategy.getScore()
     }
 }
 
 interface Strategy {
     getActivePlayerChar(): PlayerChar | undefined;
-    getWinnerChar(): PlayerChar | undefined;
+    getScore(): string;
     move(row: Coordinate, col: Coordinate, board: Board): Strategy;
 }
 
@@ -35,8 +35,8 @@ class ActiveGame implements Strategy {
         return this.players.getActive().char;
     }
 
-    getWinnerChar(): PlayerChar | undefined {
-        return;
+    getScore(): string {
+        throw new Error("Game is not finished");
     }
 
     move(row: Coordinate, col: Coordinate, board: Board): Strategy
@@ -45,6 +45,9 @@ class ActiveGame implements Strategy {
         board.getCellAt(row, col).giveTo(player);
         if (board.getLines().some((line) => line.belongsTo(player))) {
             return new FinishedGame(player);
+        }
+        if (board.isFull()) {
+            return new FinishedGame();
         }
         this.players.next();
         return this;
@@ -59,8 +62,8 @@ class FinishedGame implements Strategy {
         return;
     }
 
-    getWinnerChar(): PlayerChar | undefined {
-        return this.winner ? this.winner.char : undefined;
+    getScore(): string {
+        return this.winner ? `${this.winner.char} won!` : 'Draw!';
     }
 
     move(): Strategy {
