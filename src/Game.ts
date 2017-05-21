@@ -73,14 +73,17 @@ class Board {
     }
 
     public getLines(): Line[] {
-        const sel = (c: (0|1|2)[]) => c.map((c) => this.cells[c[0]][c[1]]);
         const diagonals = [
             [[0, 0], [1, 1], [2, 2]],
             [[0, 2], [1, 1], [2, 0]],
         ];
-        const columns = [0, 1, 2].map((col) => [[0, col], [1, col], [2, col]]);
-        const rows = [0, 1, 2].map((row) => [[row, 0], [row, 1], [row, 2]]);
-        return diagonals.concat(rows).concat(columns).map(sel).map((line) => new Line(line));
+        const cols = [0, 1, 2].map((c) => [[0, c], [1, c], [2, c]]);
+        const rows = [0, 1, 2].map((r) => [[r, 0], [r, 1], [r, 2]]);
+        return diagonals
+            .concat(rows)
+            .concat(cols)
+            .map((c) => c.map((c) => this.cells[c[0]][c[1]]))
+            .map((line) => new Line(line));
     }
 }
 
