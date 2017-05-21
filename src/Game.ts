@@ -1,123 +1,69 @@
-export class Game {
+import {Player, Char as PlayerChar, Pool as PlayerPool} from "./Game/Player";
+import {Board, Coordinate} from "./Game/Board";
+
+export default class Game {
     private readonly board = new Board();
-    private readonly players = new PlayerPool(
-        ['X', 'O'].map((s) => new Player(s))
-    );
-    private winner: Player;
+    private strategy: Strategy = new ActiveGame();
 
     public getBoard(): string {
         return this.board.toString();
     }
 
-    public getActivePlayer(): 'X' | 'O' | undefined {
-        if (this.winner) {
-            return;
-        }
+    public getActivePlayer(): PlayerChar | undefined {
+        return this.strategy.getActivePlayerChar();
+    }
+
+    public move(row: Coordinate, col: Coordinate): void {
+        this.strategy = this.strategy.move(row, col, this.board);
+    }
+
+    public getWinner(): PlayerChar | undefined {
+        return this.strategy.getWinnerChar()
+    }
+}
+
+interface Strategy {
+    getActivePlayerChar(): PlayerChar | undefined;
+    getWinnerChar(): PlayerChar | undefined;
+    move(row: Coordinate, col: Coordinate, board: Board): Strategy;
+}
+
+class ActiveGame implements Strategy {
+    private readonly players = new PlayerPool();
+
+    getActivePlayerChar(): PlayerChar {
         return this.players.getActive().char;
     }
 
-    public move(row: 0 | 1 | 2, col: 0 | 1 | 2): void {
-        if (this.winner) {
-            throw new Error('Game is finished');
-        }
+    getWinnerChar(): PlayerChar | undefined {
+        return;
+    }
+
+    move(row: Coordinate, col: Coordinate, board: Board): Strategy
+    {
         const player = this.players.getActive();
-        this.board.getCellAt(row, col).giveTo(player);
-        if (this.isWinner(player)) {
-            this.winner = player;
-        } else {
-            this.players.next();
+        board.getCellAt(row, col).giveTo(player);
+        if (board.getLines().some((line) => line.belongsTo(player))) {
+            return new FinishedGame(player);
         }
-    }
-
-    public getWinner(): 'X' | 'O' | undefined {
-        if (this.winner) {
-            return this.winner.char;
-        }
-    }
-
-    private isWinner(player: Player): boolean {
-        return this.board.getLines().some((line) => line.belongsTo(player))
+        this.players.next();
+        return this;
     }
 }
 
-class PlayerPool {
-    private active = 0;
-
-    public constructor(private readonly players: Player[]) {
+class FinishedGame implements Strategy {
+    public constructor(private readonly winner?: Player) {
     }
 
-    public getActive(): Player {
-        return this.players[this.active];
+    getActivePlayerChar(): undefined {
+        return;
     }
 
-    public next(): void {
-        this.active = (this.active + 1) % this.players.length;
-    }
-}
-
-class Board {
-    private cells: Cell[][] = [0, 1, 2].map(
-        () => [0, 1, 2].map(
-            () => new Cell()
-        )
-    );
-
-    public toString(): string {
-        return this.cells.map(
-            (row: Cell[]) => row.map(
-                (c: Cell) => c.toString()
-            ).join('')
-        ).join('');
+    getWinnerChar(): PlayerChar | undefined {
+        return this.winner ? this.winner.char : undefined;
     }
 
-    public getCellAt(row: Coordinate, col: Coordinate): Cell {
-        return this.cells[row][col];
-    }
-
-    public getLines(): Line[] {
-        const diagonals = [
-            [[0, 0], [1, 1], [2, 2]],
-            [[0, 2], [1, 1], [2, 0]],
-        ];
-        const cols = [0, 1, 2].map((c) => [[0, c], [1, c], [2, c]]);
-        const rows = [0, 1, 2].map((r) => [[r, 0], [r, 1], [r, 2]]);
-        return diagonals.concat(rows).concat(cols)
-            .map((coordinate) => coordinate.map(([row, col]) => this.cells[row][col]))
-            .map((cells) => new Line(cells));
+    move(): Strategy {
+        throw new Error("Game is finished");
     }
 }
-
-class Cell {
-    private player: Player;
-
-    public toString(): string {
-        return this.player ? this.player.char : ' ';
-    }
-
-    public giveTo(player: Player): void {
-        if (this.player) {
-            throw new Error('Cell is already used');
-        }
-        this.player = player;
-    }
-
-    public belongsTo(player: Player): boolean {
-        return player === this.player;
-    }
-}
-
-class Line {
-    public constructor(private readonly cells: Cell[]) {
-    }
-
-    public belongsTo(player: Player): boolean {
-        return this.cells.every((c) => c.belongsTo(player));
-    }
-}
-
-class Player {
-    constructor(public readonly char: 'X' | 'O') {
-    }
-}
-
-type Coordinate = 0 | 1 | 2;

@@ -1,4 +1,4 @@
-import {Game} from "../src/Game";
+import Game from "../src/Game";
 
 describe('Game in initial state', () => {
     const game = new Game();
@@ -67,7 +67,7 @@ describe('Game won by O', () => {
         'O X';
 
     const game = new Game();
-    moves.map((m) => game.move(m[0], m[1]));
+    moves.map(([r, c]) => game.move(r, c));
     it(`after moves ${moves} the board should be '${expected}'`, () => {
         expect(game.getBoard()).toEqual(expected);
     });
