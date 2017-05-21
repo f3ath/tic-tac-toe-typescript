@@ -81,11 +81,9 @@ class Board {
         ];
         const cols = [0, 1, 2].map((c) => [[0, c], [1, c], [2, c]]);
         const rows = [0, 1, 2].map((r) => [[r, 0], [r, 1], [r, 2]]);
-        return diagonals
-            .concat(rows)
-            .concat(cols)
-            .map((c) => c.map((c) => this.cells[c[0]][c[1]]))
-            .map((line) => new Line(line));
+        return diagonals.concat(rows).concat(cols)
+            .map((coordinate) => coordinate.map(([row, col]) => this.cells[row][col]))
+            .map((cells) => new Line(cells));
     }
 }
 
